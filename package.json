@@ -1,0 +1,18 @@
+{
+  "name": "connect-to-hero",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/delemaf/react-project",
+  "author": "Grisha GHUKASYAN <grisha@brigad.co>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-eslint": "^8.2.2",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "prettier": "^1.11.1"
+  }
+}
