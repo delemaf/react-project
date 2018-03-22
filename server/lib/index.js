@@ -1,14 +1,28 @@
-import express from 'express';
-import levelup from 'levelup';
-import leveldown from 'leveldown';
+import Hapi from 'hapi';
 
-const app = express();
-const port = parseInt(process.env.PORT, 10) || 3000;
+import postUsers from './actions/post-users';
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+const server = Hapi.server({
+  port: 3000,
 });
 
-app.listen(port, () => {
-  console.info(`Lisening on ${port}...`);
-});
+server.route([
+  {
+    method: 'POST',
+    path: '/users',
+    config: postUsers,
+  },
+]);
+
+async function start() {
+  try {
+    await server.start();
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
+
+  console.log('Server running at:', server.info.uri);
+}
+
+start();
