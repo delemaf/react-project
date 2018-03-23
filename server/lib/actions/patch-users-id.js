@@ -21,7 +21,7 @@ export default {
   },
   handler: async ({ params, payload, auth }) => {
     try {
-      if (get(auth, 'credentials.id') != params.id) {
+      if (get(auth, 'credentials.id') !== params.id) {
         return Boom.unauthorized();
       }
 

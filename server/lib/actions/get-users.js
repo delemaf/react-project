@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import Boom from 'boom';
-import { omit, get } from 'lodash';
+import { omit } from 'lodash';
 import User from '../models/user';
 
 export default {
@@ -10,7 +10,7 @@ export default {
       name: Joi.string(),
     }).default({}),
   },
-  handler: async ({ query, auth }) => {
+  handler: async ({ query }) => {
     try {
       const users = await User.find(query);
 
