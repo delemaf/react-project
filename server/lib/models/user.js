@@ -6,4 +6,5 @@ export default mongoose.model('User', {
   name: String,
   age: Number,
   description: String,
+  image: String
 });

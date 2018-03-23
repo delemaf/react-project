@@ -18,6 +18,7 @@ export default {
         .min(18)
         .required(),
       description: Joi.string(),
+      image: Joi.string().optional()
     }),
   },
   handler: async ({ payload }, h) => {
@@ -30,7 +31,7 @@ export default {
       const result = (await User.create(payload)).toObject();
       return {
         id: result._id,
-        ...omit(result, ['_id', '__v']),
+        ...omit(result, ['_id', '__v', 'password']),
       };
     } catch (err) {
       console.error(err);
