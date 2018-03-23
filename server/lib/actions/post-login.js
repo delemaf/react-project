@@ -1,9 +1,7 @@
 import Joi from 'joi';
 import Boom from 'boom';
-import { omit } from 'lodash';
 import Bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
 import User from '../models/user';
 import { AUTH_SECRET } from '../authentification';
 
@@ -16,38 +14,26 @@ export default {
       password: Joi.string()
         .min(8)
         .required(),
-      name: Joi.string().required(),
-      age: Joi.number()
-        .integer()
-        .min(18)
-        .required(),
-      description: Joi.string(),
     }),
   },
   handler: async ({ payload }) => {
     try {
       const user = await User.findOne({ email: payload.email });
 
-      if (user) {
-        return Boom.badRequest('Email already exists');
+      if (!user) {
+        return Boom.notFound();
       }
-
-      const result = (await User.create({
-        ...payload,
-        password: Bcrypt.hashSync(payload.password, 6),
-      })).toObject();
-
+      console.log(payload.password, user.password);
+      if (!Bcrypt.compareSync(payload.password, user.password)) {
+        return Boom.badRequest();
+      }
       const token = {
-        id: result._id,
+        id: user.id,
       };
 
-      return {
-        id: result._id,
-        ...omit(result, ['_id', '__v', 'password']),
-        token: jwt.sign(token, AUTH_SECRET, {
-          expiresIn: 2592000,
-        }),
-      };
+      return jwt.sign(token, AUTH_SECRET, {
+        expiresIn: 2592000,
+      });
     } catch (err) {
       console.error(err);
       return Boom.internal(err);
