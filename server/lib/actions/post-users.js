@@ -22,6 +22,7 @@ export default {
         .min(18)
         .required(),
       description: Joi.string(),
+      image: Joi.string().optional(),
     }),
   },
   handler: async ({ payload }) => {
