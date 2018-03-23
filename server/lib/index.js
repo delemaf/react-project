@@ -3,11 +3,15 @@ import hapiAuthJWT2 from 'hapi-auth-jwt2';
 
 import { AUTH_SECRET, validate } from './authentification';
 
-import postUsers from './actions/post-users';
 import getUsers from './actions/get-users';
+import postUsers from './actions/post-users';
 import getUsersId from './actions/get-users-id';
 import patchUsersId from './actions/patch-users-id';
 import postLogin from './actions/post-login';
+import getMessages from './actions/get-messages';
+import postJoinRooms from './actions/post-join-rooms';
+import getRooms from './actions/get-rooms';
+import getMembers from './actions/get-members';
 
 async function start() {
   const server = Hapi.server({
@@ -24,6 +28,26 @@ async function start() {
     server.auth.default('jwt');
 
     server.route([
+      {
+        method: 'GET',
+        path: '/rooms/{id}/messages',
+        config: { ...getMessages, auth: 'jwt' },
+      },
+      {
+        method: 'GET',
+        path: '/rooms/{id}/members',
+        config: { ...getMembers, auth: 'jwt' },
+      },
+      {
+        method: 'POST',
+        path: '/rooms/{id}/join',
+        config: { ...postJoinRooms, auth: 'jwt' },
+      },
+      {
+        method: 'GET',
+        path: '/rooms',
+        config: { ...getRooms, auth: 'jwt' },
+      },
       {
         method: 'POST',
         path: '/users',

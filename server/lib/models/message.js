@@ -1,7 +1,10 @@
 import mongoose from '../database';
+import { anonymeSchema } from './anonyme';
 
-export default mongoose.model('Message', {
+export const messageSchema = new mongoose.Schema({
   text: String,
   date: { type: Date, default: Date.now },
-  user: Number
+  anonyme: anonymeSchema,
 });
+
+export default mongoose.model('Message', messageSchema);

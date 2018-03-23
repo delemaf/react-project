@@ -1,10 +1,12 @@
 import mongoose from '../database';
 
-export default mongoose.model('User', {
+export const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   name: String,
   age: Number,
   description: String,
-  image: String
+  image: String,
 });
+
+export default mongoose.model('User', userSchema);
