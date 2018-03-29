@@ -9,7 +9,7 @@ export default {
 
       return rooms.map(room => ({
         id: room._id,
-        ...omit(room.toObject(), ['_id', '__v']),
+        ...omit(room.toObject(), ['_id', '__v', 'anonymes', 'messages']),
       }));
     } catch (err) {
       console.error(err);

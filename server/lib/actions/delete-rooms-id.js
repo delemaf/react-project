@@ -1,10 +1,9 @@
 import Joi from 'joi';
 import Boom from 'boom';
 
-import { omit, get, find } from 'lodash';
+import { get, find } from 'lodash';
 import User from '../models/user';
 import Room from '../models/room';
-import Anonyme from '../models/anonyme';
 
 export default {
   validate: {
@@ -19,7 +18,7 @@ export default {
       const userId = get(auth, 'credentials.id');
       const user = await User.findById(userId);
       const room = await Room.findById(params.id);
-      let alreadyExists = false;
+      let found = false;
 
       if (!user) {
         return Boom.notFound('User not found');
@@ -27,29 +26,22 @@ export default {
         return Boom.notFound('Room not found');
       }
 
-      alreadyExists = !!find(room.anonymes.toObject(), { _id: userId });
+      found = !!find(
+        room.anonymes.toObject(),
+        anonyme =>
+          anonyme.user._id.toString() === userId && anonyme.admin === true,
+      );
 
-      if (alreadyExists) {
-        return Boom.conflict('User already exists on the room');
+      if (found) {
+        room.anonymes.forEach((anonyme) => {
+          anonyme.remove();
+        });
+        room.remove();
+        return h.response({}).code(204);
       }
-
-      const anonyme = new Anonyme({
-        room: room._id,
-        user: userId,
-      });
-
-      await anonyme.save();
-
-      await room.save({
-        anononymes: [...room.anononymes, anonyme],
-      });
-
-      return h
-        .response({
-          id: anonyme._id,
-          ...omit(anonyme, ['user', '_id', '__v']),
-        })
-        .code(201);
+      return Boom.unauthorized(
+        'You cannot delete this room if you are not admin',
+      );
     } catch (err) {
       console.error(err);
       return Boom.internal(err);

@@ -12,6 +12,8 @@ import getMessages from './actions/get-messages';
 import postJoinRooms from './actions/post-join-rooms';
 import getRooms from './actions/get-rooms';
 import getMembers from './actions/get-members';
+import postRooms from './actions/post-rooms';
+import deleteRooms from './actions/delete-rooms-id';
 
 async function start() {
   const server = Hapi.server({
@@ -47,6 +49,16 @@ async function start() {
         method: 'GET',
         path: '/rooms',
         config: { ...getRooms, auth: 'jwt' },
+      },
+      {
+        method: 'POST',
+        path: '/rooms',
+        config: { ...postRooms, auth: 'jwt' },
+      },
+      {
+        method: 'DELETE',
+        path: '/rooms/{id}',
+        config: { ...deleteRooms, auth: 'jwt' },
       },
       {
         method: 'POST',
