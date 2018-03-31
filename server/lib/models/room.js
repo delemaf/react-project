@@ -8,6 +8,7 @@ export default mongoose.model('Room', {
   messages: [messageSchema],
   createdAt: { type: Date, default: Date.now },
   anonymes: [anonymeSchema],
+  kicked: [anonymeSchema],
   maxUsers: Number,
   description: String,
 });

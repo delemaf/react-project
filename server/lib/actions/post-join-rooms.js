@@ -20,6 +20,7 @@ export default {
       const user = await User.findById(userId);
       const room = await Room.findById(params.id);
       let alreadyExists = false;
+      let isKicked = false;
 
       if (!user) {
         return Boom.notFound('User not found');
@@ -27,10 +28,23 @@ export default {
         return Boom.notFound('Room not found');
       }
 
-      alreadyExists = !!find(room.anonymes.toObject(), { _id: userId });
+      if (room.anonymes.count() === room.maxUsers) {
+        return Boom.forbidden('cannot join this room');
+      }
+
+      alreadyExists = !!find(
+        room.anonymes.toObject(),
+        anonyme => anonyme.user._id.toString() === userId,
+      );
+      isKicked = !!find(
+        room.kicked.toObject(),
+        anonyme => anonyme.user._id.toString() === userId,
+      );
 
       if (alreadyExists) {
         return Boom.conflict('User already exists on the room');
+      } else if (isKicked) {
+        return Boom.unauthorized('You have been kicked from this room');
       }
 
       const anonyme = new Anonyme({

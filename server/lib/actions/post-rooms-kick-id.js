@@ -4,6 +4,7 @@ import Boom from 'boom';
 import { get, find } from 'lodash';
 import User from '../models/user';
 import Room from '../models/room';
+import Anonyme from '../models/anonyme';
 
 export default {
   validate: {
@@ -12,11 +13,17 @@ export default {
         .regex(/^[0-9a-fA-F]{24}$/)
         .required(),
     }),
+    query: {
+      anonymeId: Joi.string()
+        .regex(/^[0-9a-fA-F]{24}$/)
+        .required(),
+    },
   },
-  handler: async ({ params, auth }, h) => {
+  handler: async ({ params, query, auth }, h) => {
     try {
       const userId = get(auth, 'credentials.id');
       const user = await User.findById(userId);
+      const anon = await Anonyme.findById(query.anonymeId);
       const room = await Room.findById(params.id);
       let found = false;
 
@@ -24,6 +31,8 @@ export default {
         return Boom.notFound('User not found');
       } else if (!room) {
         return Boom.notFound('Room not found');
+      } else if (!anon) {
+        return Boom.notFound('Anonyme not found');
       }
 
       found = !!find(
@@ -34,16 +43,19 @@ export default {
 
       if (found) {
         room.anonymes.forEach((anonyme) => {
-          anonyme.remove();
+          if (
+            anonyme._id.toString() === query.anonymeId
+            && anonyme.admin === false
+          ) {
+            room.kicked.push(anonyme);
+            room.anonymes.pull(anonyme);
+            room.save();
+          }
         });
-        room.kicked.forEach((anonyme) => {
-          anonyme.remove();
-        });
-        room.remove();
         return h.response({}).code(204);
       }
       return Boom.unauthorized(
-        'You cannot delete this room if you are not admin',
+        'You cannot kick an anonyme if you are not admin',
       );
     } catch (err) {
       console.error(err);

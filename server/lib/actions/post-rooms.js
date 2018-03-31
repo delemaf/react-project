@@ -60,7 +60,13 @@ export default {
       return h
         .response({
           id: room._id,
-          ...omit(room.toObject(), ['messages', '_id', '__v', 'anonymes']),
+          ...omit(room.toObject(), [
+            'messages',
+            '_id',
+            '__v',
+            'anonymes',
+            'kicked',
+          ]),
         })
         .code(201);
     } catch (err) {

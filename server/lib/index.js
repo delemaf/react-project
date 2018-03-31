@@ -14,6 +14,7 @@ import getRooms from './actions/get-rooms';
 import getMembers from './actions/get-members';
 import postRooms from './actions/post-rooms';
 import deleteRooms from './actions/delete-rooms-id';
+import postRoomsKickId from './actions/post-rooms-kick-id';
 
 async function start() {
   const server = Hapi.server({
@@ -59,6 +60,11 @@ async function start() {
         method: 'DELETE',
         path: '/rooms/{id}',
         config: { ...deleteRooms, auth: 'jwt' },
+      },
+      {
+        method: 'POST',
+        path: '/rooms/{id}/kick',
+        config: { ...postRoomsKickId, auth: 'jwt' },
       },
       {
         method: 'POST',
