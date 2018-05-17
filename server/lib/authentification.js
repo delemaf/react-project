@@ -7,7 +7,8 @@ const JoiUUID = Joi.string()
   .required();
 
 export const validate = ({ id }) => {
-  console.log(id, Joi.validate(id, JoiUUID));
+  Joi.validate(id, JoiUUID);
+
   if (!id) {
     return { isValid: false };
   }

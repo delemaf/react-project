@@ -4,6 +4,7 @@ import Boom from 'boom';
 import { get, find } from 'lodash';
 import User from '../models/user';
 import Room from '../models/room';
+import RoomsManager from '../rooms-manager';
 
 export default {
   validate: {
@@ -39,6 +40,7 @@ export default {
         room.kicked.forEach((anonyme) => {
           anonyme.remove();
         });
+        RoomsManager.deleteRoom(room._id);
         room.remove();
         return h.response({}).code(204);
       }

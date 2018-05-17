@@ -1,7 +1,8 @@
 import Joi from 'joi';
 import Boom from 'boom';
-import { omit } from 'lodash';
+import { get, omit } from 'lodash';
 import Room from '../models/room';
+import RoomsManager from '../rooms-manager';
 
 export default {
   validate: {
@@ -11,9 +12,21 @@ export default {
         .required(),
     }),
   },
-  handler: async ({ params }) => {
+  handler: async ({ params, auth }) => {
     try {
-      const room = (await Room.findById(params.id)).toObject();
+      const userId = get(auth, 'credentials.id');
+
+      let room = RoomsManager.findById(params.id);
+      if (!room) {
+        return Boom.notFound('Room not found');
+      }
+      const anonyme = room.anonymes.filter(ano => ano.userId === userId)[0];
+
+      if (!anonyme) {
+        return Boom.unauthorized('Unauthorized to get these messages');
+      }
+
+      room = (await Room.findById(params.id)).toObject();
 
       if (!room) {
         return Boom.notFound('Room not found');

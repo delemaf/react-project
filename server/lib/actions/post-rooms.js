@@ -43,6 +43,7 @@ export default {
       const anonyme = new Anonyme({
         user,
         admin: true,
+        spoiled: true,
       });
 
       await anonyme.save();

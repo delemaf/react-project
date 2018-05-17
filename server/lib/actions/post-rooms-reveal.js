@@ -14,50 +14,35 @@ export default {
         .regex(/^[0-9a-fA-F]{24}$/)
         .required(),
     }),
-    payload: {
-      anonymeId: Joi.string()
-        .regex(/^[0-9a-fA-F]{24}$/)
-        .required(),
-    },
   },
-  handler: async ({ params, payload, auth }, h) => {
+  handler: async ({ params, auth }, h) => {
     try {
       const userId = get(auth, 'credentials.id');
       const user = await User.findById(userId);
-      const anon = await Anonyme.findById(payload.anonymeId);
       let room = await Room.findById(params.id);
-      let found = false;
 
       if (!user) {
         return Boom.notFound('User not found');
       } else if (!room) {
         return Boom.notFound('Room not found');
-      } else if (!anon) {
-        return Boom.notFound('Anonyme not found');
       }
 
-      found = !!find(
-        room.anonymes.toObject(),
-        anonyme =>
-          anonyme.user._id.toString() === userId && anonyme.admin === true,
+      const ano = find(
+        room.anonymes,
+        anonyme => anonyme.user._id.toString() === userId,
       );
 
-      if (found) {
-        room.anonymes.forEach((anonyme) => {
-          if (
-            anonyme._id.toString() === payload.anonymeId
-            && anonyme.admin === false
-          ) {
-            room.kicked.push(anonyme);
-            room.anonymes.pull(anonyme);
-            RoomsManager.deleteAnonyme(room._id, anonyme._id);
-            room.save();
-          }
-        });
-        const anoModel = await RoomsManager.getMember(anon._id);
+      if (ano) {
+        const anonyme = await Anonyme.findById(ano._id);
+        const anoModel = await RoomsManager.getMember(ano._id);
+
+        anonyme.spoiled = true;
+        ano.spoiled = true;
+        anonyme.save();
+        room.save();
         room = RoomsManager.findById(params.id);
         const data = {
-          type: 'KICK',
+          type: 'REVEAL',
           data: {
             room: room.roomId,
             member: anoModel,
@@ -68,9 +53,7 @@ export default {
         await RoomsManager.sendMessage(room, anoModel.anonymeId, data);
         return h.response({}).code(204);
       }
-      return Boom.unauthorized(
-        'You cannot kick an anonyme if you are not admin',
-      );
+      return Boom.notFound('Member not found');
     } catch (err) {
       console.error(err);
       return Boom.internal(err);

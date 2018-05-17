@@ -5,6 +5,7 @@ import { omit, get, find } from 'lodash';
 import User from '../models/user';
 import Room from '../models/room';
 import Anonyme from '../models/anonyme';
+import RoomsManager from '../rooms-manager';
 
 export default {
   validate: {
@@ -28,7 +29,7 @@ export default {
         return Boom.notFound('Room not found');
       }
 
-      if (room.anonymes.count() === room.maxUsers) {
+      if (room.anonymes.length === room.maxUsers) {
         return Boom.forbidden('cannot join this room');
       }
 
@@ -48,20 +49,27 @@ export default {
       }
 
       const anonyme = new Anonyme({
-        room: room._id,
-        user: userId,
+        user,
       });
 
       await anonyme.save();
 
-      await room.save({
-        anononymes: [...room.anononymes, anonyme],
-      });
+      room.anonymes = [...room.anonymes, anonyme];
+
+      await room.save();
+
+      RoomsManager.addAnonymeOnRoom(anonyme._id, room._id, userId);
 
       return h
         .response({
-          id: anonyme._id,
-          ...omit(anonyme, ['user', '_id', '__v']),
+          id: room._id,
+          ...omit(room.toObject(), [
+            'messages',
+            '_id',
+            '__v',
+            'anonymes',
+            'kicked',
+          ]),
         })
         .code(201);
     } catch (err) {

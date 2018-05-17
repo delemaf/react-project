@@ -1,8 +1,7 @@
 import Joi from 'joi';
 import Boom from 'boom';
-import { omit } from 'lodash';
 import Room from '../models/room';
-import Anonyme from '../models/anonyme';
+import RoomsManager from '../rooms-manager';
 
 export default {
   validate: {
@@ -12,28 +11,16 @@ export default {
         .required(),
     }),
   },
-  handler: async ({ payload }) => {
+  handler: async ({ params }) => {
     try {
-      const room = await Room.findById(payload.id);
+      const room = await Room.findById(params.id);
 
       if (!room) {
         return Boom.notFound('Room not found');
       }
 
-      const anonymes = (await Anonyme.find({ room: room._id })).toObject();
-
-      anonymes.forEach((anonyme) => {
-        anonyme.id = anonyme._id;
-        omit(anonyme, ['_id', '__v']);
-        if (anonyme.spoiled || anonyme.admin) {
-          anonyme.user = {
-            id: anonyme.user._id,
-            ...omit(anonyme.user.toObject(), ['_id', '__v', 'password']),
-          };
-        } else {
-          omit(anonyme, ['user']);
-        }
-      });
+      const anonymes = await RoomsManager.getMembers(room._id);
+      console.log(anonymes);
 
       return anonymes;
     } catch (err) {
