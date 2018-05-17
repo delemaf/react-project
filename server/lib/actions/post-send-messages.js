@@ -19,7 +19,6 @@ export default {
   handler: async ({ payload, websocket, auth }) => {
     try {
       const userId = get(auth, 'credentials.id');
-      console.log('test');
 
       const { ws } = websocket();
 
@@ -52,7 +51,6 @@ export default {
       } else if (payload.type === 'MESSAGE') {
         // MESSAGE
         const room = RoomsManager.findById(payload.data.room);
-        console.log(room);
         if (!room) {
           return Boom.notFound('Room not found');
         }

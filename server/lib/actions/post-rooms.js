@@ -5,6 +5,7 @@ import { omit, get } from 'lodash';
 import User from '../models/user';
 import Room from '../models/room';
 import Anonyme from '../models/anonyme';
+import RoomsManager from '../rooms-manager';
 
 export default {
   validate: {
@@ -13,7 +14,7 @@ export default {
         .required()
         .error(() => 'name'),
       tags: Joi.array()
-        .items(Joi.string())
+        .items(Joi.string().regex(/^[0-9a-zA-Z]{2,20}$/))
         .max(10)
         .default([])
         .optional()
@@ -51,12 +52,15 @@ export default {
       const room = new Room({
         name: payload.name,
         tags: payload.tags,
-        maxUsers: payload.max_users,
+        maxUsers: payload.maxUsers,
         description: payload.description,
         anonymes: [anonyme],
       });
 
       await room.save();
+
+      RoomsManager.addRoom(room._id);
+      RoomsManager.addAnonymeOnRoom(room._id, anonyme._id, userId);
 
       return h
         .response({

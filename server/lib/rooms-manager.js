@@ -50,7 +50,12 @@ class RoomsManager {
   }
 
   deleteRoom(roomId) {
-    const index = this.rooms.findIndex(room => room.roomId === roomId);
+    const index = this.rooms.findIndex(
+      room => room.roomId.toString() === roomId.toString(),
+    );
+
+    console.log(roomId);
+    console.log(index);
 
     if (index !== -1) {
       this.rooms.splice(index, 1);
@@ -108,12 +113,15 @@ class RoomsManager {
 
   async sendMessage(room, anonymeId, payload) {
     const ano = await Anonyme.findById(anonymeId);
-    if (payload.data.message.length > 0 && payload.data.type === 'MESSAGE') {
+    const roomModel = await Room.findById(room.roomId);
+    if (payload.data.message.length > 0 && payload.type === 'MESSAGE') {
       const message = new Message({
         text: payload.data.message,
         anonyme: ano,
       });
       message.save();
+      roomModel.messages = [...roomModel.messages, message];
+      roomModel.save();
     }
     room.anonymes.forEach((anom) => {
       if (anom.ws != null) {

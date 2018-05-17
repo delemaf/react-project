@@ -12,10 +12,11 @@ import deleteRooms from './actions/delete-rooms-id';
 import postRoomsKickId from './actions/post-rooms-kick-id';
 import postSendMessages from './actions/post-send-messages';
 import postRoomsReveal from './actions/post-rooms-reveal';
+import getRoomsTag from './actions/get-rooms-tag';
 
 const routes = [
   {
-    method: 'GET',
+    method: 'POST',
     path: '/rooms/{id}/messages',
     config: { ...getMessages, auth: 'jwt' },
   },
@@ -78,6 +79,11 @@ const routes = [
     method: 'POST',
     path: '/rooms/{id}/reveal',
     config: { ...postRoomsReveal, auth: 'jwt' },
+  },
+  {
+    method: 'GET',
+    path: '/rooms/tag/{tag}',
+    config: { ...getRoomsTag, auth: 'jwt' },
   },
   {
     method: 'POST',

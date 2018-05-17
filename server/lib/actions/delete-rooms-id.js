@@ -5,6 +5,8 @@ import { get, find } from 'lodash';
 import User from '../models/user';
 import Room from '../models/room';
 import RoomsManager from '../rooms-manager';
+import Anonyme from '../models/anonyme';
+import Message from '../models/message';
 
 export default {
   validate: {
@@ -35,10 +37,25 @@ export default {
 
       if (found) {
         room.anonymes.forEach((anonyme) => {
+          Anonyme.findById(anonyme._id)
+            .remove()
+            .exec();
+
           anonyme.remove();
         });
         room.kicked.forEach((anonyme) => {
+          Anonyme.findById(anonyme._id)
+            .remove()
+            .exec();
+
           anonyme.remove();
+        });
+        room.messages.forEach((message) => {
+          Message.findById(message._id)
+            .remove()
+            .exec();
+
+          message.remove();
         });
         RoomsManager.deleteRoom(room._id);
         room.remove();
