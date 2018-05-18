@@ -1,18 +1,11 @@
-import Joi from 'joi';
 import Boom from 'boom';
 import { omit } from 'lodash';
 import User from '../models/user';
 
 export default {
-  validate: {
-    query: Joi.object({
-      email: Joi.string().email(),
-      name: Joi.string(),
-    }).default({}),
-  },
-  handler: async ({ query }) => {
+  handler: async () => {
     try {
-      const users = await User.find(query);
+      const users = await User.find();
 
       return users.map(user => ({
         id: user._id,

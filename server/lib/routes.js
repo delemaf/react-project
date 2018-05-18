@@ -13,6 +13,8 @@ import postRoomsKickId from './actions/post-rooms-kick-id';
 import postSendMessages from './actions/post-send-messages';
 import postRoomsReveal from './actions/post-rooms-reveal';
 import getRoomsTag from './actions/get-rooms-tag';
+import postUsersPicture from './actions/post-users-picutre';
+import getUsersPicture from './actions/get-users-picture';
 
 const routes = [
   {
@@ -84,6 +86,23 @@ const routes = [
     method: 'GET',
     path: '/rooms/tag/{tag}',
     config: { ...getRoomsTag, auth: 'jwt' },
+  },
+  {
+    method: 'POST',
+    path: '/users/picture',
+    config: {
+      payload: {
+        output: 'file',
+        maxBytes: 1000 * 1000 * 2,
+      },
+      ...postUsersPicture,
+      auth: 'jwt',
+    },
+  },
+  {
+    method: 'GET',
+    path: '/users/{id}/picture',
+    config: { ...getUsersPicture, auth: 'jwt' },
   },
   {
     method: 'POST',
