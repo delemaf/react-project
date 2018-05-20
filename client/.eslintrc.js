@@ -12,9 +12,9 @@ module.exports = {
     'arrow-parens': ['error', 'as-needed', { requireForBlockBody: true }],
     'consistent-return': 'error',
     'operator-linebreak': ['error', 'before'],
-    'no-console': 'off',
     strict: 'off',
-    'import/prefer-default-export': 'off',
+    'react/prop-types': [0],
+    'import/prefer-default-export': 'warn',
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'react/prefer-stateless-function': [0, { ignorePureComponents: true }],
     'jsx-a11y/anchor-is-valid': [
