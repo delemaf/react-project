@@ -23,7 +23,7 @@ export default {
       if (!user) {
         return Boom.notFound();
       }
-      console.log(payload.password, user.password);
+
       if (!Bcrypt.compareSync(payload.password, user.password)) {
         return Boom.badRequest();
       }

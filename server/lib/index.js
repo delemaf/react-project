@@ -7,7 +7,8 @@ import routes from './routes';
 
 async function start() {
   const server = Hapi.server({
-    port: 3000,
+    port: 4000,
+    routes: { cors: { origin: ['*'] } },
   });
 
   try {
@@ -20,7 +21,6 @@ async function start() {
     server.auth.default('jwt');
 
     server.route(routes);
-
     await server.start();
   } catch (err) {
     console.log(err);

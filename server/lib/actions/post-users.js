@@ -21,7 +21,9 @@ export default {
         .integer()
         .min(18)
         .required(),
-      description: Joi.string(),
+      description: Joi.string()
+        .default('')
+        .optional(),
       image: Joi.string().optional(),
     }),
   },
